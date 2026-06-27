@@ -148,11 +148,11 @@
 <div class="shiftboard">
   <div class="wrap" style="padding:0;">
     <div class="sb-row">
-      <div class="sb-title">JOSHUA ACADEMY // SHIFT BOARD v1.0</div>
+      <div class="sb-title">SHOPEE OPS TEAM LEAD // JO PREP BOARD</div>
       <div class="sb-clock" id="clock">--:--:-- PHT</div>
     </div>
     <div class="sb-greet" id="greet">Good evening, Joshua</div>
-    <div class="sb-sub" id="missionLine">Leadership Track · Day 1</div>
+    <div class="sb-sub" id="missionLine">Awaiting Job Offer · Day 1 Prep</div>
   </div>
 </div>
 
@@ -170,7 +170,7 @@
 
     <!-- RIGHT: PROMOTION SCORE -->
     <div class="panel">
-      <div class="panel-head"><h2>Promotion Readiness</h2></div>
+      <div class="panel-head"><h2>Day-1 Readiness</h2></div>
       <div class="score-wrap">
         <div class="score-num" id="scoreNum">0%</div>
         <div class="score-label">Composite Score</div>
@@ -220,26 +220,25 @@
 </div>
 
 <script>
-/* ============== DATA: 14-DAY LEADERSHIP + ANALYTICS TRACK ============== */
-/* Operational basics (receiving, putaway, picking, etc.) already mastered
-   through 3+ years across Nokia/Globe 3PL, Airspeed, and CubeworkPH.
-   This track skips ahead to Leadership and the Excel → Power Query →
-   SQL → Power BI → Python analytics progression. */
+/* ============== DATA: 14-DAY SHOPEE OPERATIONS TEAM LEAD — JO PREP TRACK ============== */
+/* Rebuilt for a specific, confirmed context: interview passed, awaiting Job Offer
+   for Operations (Warehouse) Team Lead, Manila. Every day maps directly to a
+   responsibility line from that JD, not generic warehouse/leadership theory. */
 const MISSIONS = [
-  {topic:"Leading Former Peers", study:"The hardest leadership transition: managing people who used to be your equals. The core shift is from 'doing the work well' to 'making the team's work go well' — and why authority granted by title isn't the same as authority earned by respect.", practical:"Write down one specific peer-turned-subordinate situation you can realistically face (or have faced). What would you say in your first 1-on-1 with them as their lead?", leadership:"Draft a 3-sentence opening line for that first conversation that neither over-apologizes for the promotion nor pretends nothing changed."},
-  {topic:"Excel — Beyond XLOOKUP", study:"Where most 'advanced Excel' users actually plateau: structured tables, named ranges, INDEX/MATCH vs XLOOKUP edge cases, and array formulas (SUMPRODUCT, FILTER) for multi-condition lookups.", practical:"Take a real inventory dataset shape you've worked with (SKU, location, qty, last-counted date). Write the formula logic (in words or Excel syntax) you'd use to flag any SKU not counted in 30+ days.", leadership:"none"},
-  {topic:"Giving Instructions", study:"Why vague instructions ('be more careful') fail and specific, observable instructions succeed. The structure: state the standard, show the gap, give one corrective action, set a check-in point.", practical:"Take a real instance of a teammate's repeated small error (e.g. wrong UOM entry). Rewrite the correction as one specific, observable instruction.", leadership:"Practice saying it out loud once before you'd actually say it to someone — does it sound like blame or direction?"},
-  {topic:"Power Query", study:"Power Query as the missing link between messy exports and clean analysis: combining multiple CSV/Excel exports, unpivoting columns, and building a repeatable refresh step instead of manual copy-paste every time.", practical:"Describe a real recurring report you've built manually (e.g. discrepancy report, SKU master review). Outline the Power Query steps that would automate the cleanup: Source → Remove columns → Unpivot → Merge → Load.", leadership:"none"},
-  {topic:"Coaching", study:"Coaching vs. correcting: correcting fixes one instance, coaching builds the skill so the person catches their own mistakes next time. The GROW model basics — Goal, Reality, Options, Way forward.", practical:"Pick a real skill gap you've seen in a teammate (e.g. cycle count accuracy). Run a mini GROW conversation on paper: what's the goal, what's the current reality, what 2 options exist, what's their committed next step.", leadership:"none"},
-  {topic:"SQL Fundamentals", study:"SELECT, WHERE, ORDER BY, and GROUP BY — the four clauses that cover most real warehouse reporting questions: 'which SKUs', 'how many', 'by what category', 'in what order'.", practical:"Write the SQL you'd use to answer a real question from your work: 'List all SKUs with on-hand quantity below 10, ordered by quantity ascending.' Just write the query logic — accuracy of syntax matters more than memorized keywords.", leadership:"none"},
-  {topic:"Handling Conflict", study:"Why most workplace conflict is really a disagreement about either priorities or information — and why naming which one it is defuses half the tension before you even propose a solution.", practical:"Recall a real disagreement you've had with a coworker or vendor (e.g. discrepancy blame, delivery timing). Identify: was it a priorities conflict or an information conflict? What changes if you reframe it that way?", leadership:"none"},
-  {topic:"SQL Joins & Aggregation", study:"INNER vs LEFT JOIN — the difference between 'only matching records' and 'all records, matched or not' — and why this distinction is exactly what catches orphaned PO lines or unmatched receiving records.", practical:"Describe two tables you'd realistically have (e.g. Purchase_Orders and Receiving_Log). Write the JOIN logic to find all POs that have NO matching receiving record yet — a real aged-PO problem you've handled before.", leadership:"none"},
-  {topic:"Difficult Employees", study:"The difference between a skill problem, a will problem, and a fit problem — because the fix is completely different for each, and applying the wrong fix (e.g. more training for a will problem) wastes everyone's time.", practical:"Think of a real difficult-employee pattern you've observed (not necessarily managed directly). Classify it: skill, will, or fit? What evidence supports that classification?", leadership:"none"},
-  {topic:"Power BI Basics", study:"How Power BI's data model differs from a flat Excel sheet: fact tables vs dimension tables, and why a clean data model makes every future report faster to build instead of starting from scratch each time.", practical:"Sketch (in words) a simple data model for a warehouse KPI dashboard: what would your fact table be (e.g. daily transactions), and what dimension tables would you connect to it (SKU, location, shift, date)?", leadership:"none"},
-  {topic:"Escalations & Decision Making", study:"The escalation decision tree: can I fix this now with what I know? Can it wait for the next handover? Does it need to go up immediately? Most escalation mistakes are timing mistakes, not judgment mistakes.", practical:"Recall a real issue you escalated (or should have). Walk it through the 3-question tree above — would your original timing have changed?", leadership:"none"},
-  {topic:"Power BI — DAX Basics", study:"DAX measures vs calculated columns, and the single most useful pattern for ops dashboards: CALCULATE with a filter, e.g. 'total units received this month' or 'discrepancy count this week vs last week'.", practical:"Write (in plain words, not exact syntax) the logic for a DAX measure that shows 'inventory accuracy % this month' using a count of correct counts divided by total counts.", leadership:"none"},
-  {topic:"Delegation & Time Management", study:"Why delegation fails most often at the handoff, not the task itself — missing context, unclear deadline, or no defined 'done.' Time management for a lead is less about your own calendar and more about protecting the team's focus blocks.", practical:"Pick a real task you currently do yourself that someone else could own. Write the 3-part handoff: context, deadline, definition of done.", leadership:"none"},
-  {topic:"Python for Automation", study:"Where Python actually starts paying off past Excel/SQL: scheduled scripts that pull data, clean it, and push it somewhere else automatically — the same shape as the AI bulk-update workflow you already sandbox-tested at CubeworkPH, just script-driven instead of AI-driven.", practical:"Describe, step by step, what a Python script would need to do to replicate one real automation you've already built or used (e.g. the Shopify scraper + AI description workflow). What are the inputs, the transform steps, and the output?", leadership:"none"},
+  {topic:"Where Warehouse Sits in Shopee Ops", study:"Shopee's Operations team spans Customer Service, Payment, Listings, Warehouse, Logistics, Seller Operations, and Fraud — all tracking the buyer's journey from search to delivery. As Warehouse Team Lead, your slice is the physical inbound-to-outbound flow, but discrepancies you catch (or miss) ripple into Logistics SLAs and Seller Ops disputes downstream.", practical:"Map, in your own words, one example of how a warehouse discrepancy you've handled before (e.g. the COI cross-PO misassignment) could have shown up as a problem in a different department (Seller Ops, Logistics) if it hadn't been caught at your stage.", leadership:"none"},
+  {topic:"Assigning Daily Tasks Under a Shift Lead", study:"This role assigns tasks 'as directed by the Warehouse Shift Lead' — meaning you're translating your Shift Lead's priorities into specific assignments for warehouse staff, not setting priorities yourself. The skill is fast, clear translation: shift priority → who does what → by when.", practical:"Write a realistic task assignment script: your Shift Lead tells you 'inbound is backing up, outbound SLA is at risk in 2 hours' — what 3 specific task assignments do you give your team in the next 5 minutes?", leadership:"Draft how you'd hand off one of those tasks to a specific person — context, deadline, what 'done' looks like."},
+  {topic:"Initial Delivery Checks & Discrepancy Reporting", study:"The JD specifically calls out reporting shortages, overages, and damages to the Shift Lead or appropriate department. This is your strongest existing skill (COI audits, PO/DR verification at Airspeed) — the new part is the reporting chain: what gets escalated immediately vs. logged for the shift report.", practical:"Using a real discrepancy you've caught before, write it as a discrepancy report formatted the way you'd report it to a Shift Lead: Item, Expected, Actual, Type (shortage/overage/damage), Immediate Action Taken.", leadership:"none"},
+  {topic:"Timely Documentation of Received Items & Transfers", study:"'Timely' is the operative word — Shopee's JD distinguishes this from just 'accurate' documentation. Internal transfers especially get lost when documentation lags behind the physical movement, since the system and the floor drift apart fast at e-commerce volume.", practical:"Describe your real documentation habit (e.g. your daily Inventory Master review at CubeworkPH) and identify where in that process delay was most likely to creep in. What's the one check you'd add to keep documentation same-day?", leadership:"none"},
+  {topic:"Maintaining Inbound Transaction Records for Reporting", study:"Records here serve two audiences: operational tracking (can we find this shipment right now) and reporting (what does this week's inbound volume and accuracy look like). The same record needs to serve both without extra rework.", practical:"Sketch a simple inbound log structure (columns) that would let you answer both 'where is shipment X right now' and 'what was our inbound accuracy % this week' from the same sheet.", leadership:"none"},
+  {topic:"Tracking Attendance & Task Completion", study:"This is a Team Lead-specific responsibility, not an individual contributor one — you're now accountable for other people's presence and output, not just your own. The core challenge is keeping this current in real time during a shift, not reconstructing it afterward.", practical:"Design a simple attendance + task-completion tracker (rows = staff, columns = scheduled tasks + status) you could realistically update every hour during a live shift without it becoming a burden.", leadership:"Write how you'd address a staff member who clocked in on time but whose task board shows nothing completed 2 hours into the shift."},
+  {topic:"Compiling Performance Data & Shift Reports", study:"You're assisting the Shift Lead compile this, not authoring it solo — meaning your job is clean, ready-to-use data handed up, not final interpretation. Speed and consistency of format matter more than depth of analysis at this level.", practical:"Using your attendance/task tracker from Day 6, write the 4-5 line summary you'd hand your Shift Lead at end of shift: volume handled, discrepancies found, staffing notes, anything flagged for next shift.", leadership:"none"},
+  {topic:"Promoting Safety & Warehouse Guideline Adherence", study:"'Promote adherence' (not just 'follow') means you're now responsible for other people's compliance, including catching shortcuts under pressure — the exact moment most safety lapses happen.", practical:"Recall one near-miss or shortcut you've witnessed on a warehouse floor (yours or hypothetical). Write the in-the-moment correction you'd give as Team Lead — short, immediate, non-negotiable.", leadership:"Write a 1-sentence rule you'd repeat consistently enough that your team internalizes it without you having to say it every shift."},
+  {topic:"Coaching Warehouse Staff Mid-Shift", study:"Coaching at this level isn't a sit-down conversation — it's a 30-second correction during a live shift that still builds the skill instead of just fixing the immediate error, so it doesn't repeat next shift.", practical:"Take a real skill gap you've seen (e.g. inconsistent UOM entry, slow discrepancy flagging). Write the 30-second, in-the-moment coaching line you'd give without stopping the floor.", leadership:"none"},
+  {topic:"Escalation Judgment: Fix It vs. Flag It", study:"The JD draws a clear line: 'report to the Shift Lead or appropriate department.' Knowing which one — and how fast — is the actual judgment call this role is testing. Most new Team Leads either escalate everything (annoying) or nothing (risky).", practical:"List 3 realistic warehouse situations from this role and classify each: handle yourself, flag to Shift Lead same-shift, or escalate to another department immediately.", leadership:"none"},
+  {topic:"Handling Conflict on the Floor", study:"As a new Team Lead, the most common early conflict is staff testing whether you'll actually enforce the standard, especially right after promotion or a new hire onboarding. Most of these are priority disagreements, not personal ones.", practical:"Write how you'd respond, in the moment, to a staff member who pushes back on a task assignment with 'that's not my job.'", leadership:"none"},
+  {topic:"Giving Clear Instructions Under Time Pressure", study:"Shift-floor instructions need to survive noise, urgency, and multiple people at once — vague instructions that work fine in a calm meeting fail completely during a backed-up inbound rush.", practical:"Rewrite this vague instruction into a specific, shift-floor-ready one: 'Someone check on the damaged pallets.'", leadership:"none"},
+  {topic:"Mock Shift Report — Full Exercise", study:"Pulling Days 3, 4, 6, and 7 together: this is a full simulated end of shift, the way it would actually happen.", practical:"Build one complete mock shift report from a fictional (but realistic) shift: 3 discrepancies found, 1 staff attendance issue, task completion at 85%, one safety note. Write it exactly as you'd hand it to your Shift Lead.", leadership:"none"},
+  {topic:"Day-1 Floor Simulation", study:"Your first real shift will move faster than any of this prep. The goal isn't to have memorized answers — it's to have already rehearsed the decision patterns so Day 1 feels like pattern-matching, not improvising from zero.", practical:"Walk through this sequence and write your real-time decision at each point: 08:30 truck arrives with 2 damaged pallets → 09:00 a staff member is absent with no call → 09:45 Shift Lead asks for a quick status update. What do you do, in order, and what (if anything) gets escalated?", leadership:"none"},
 ];
 
 const XP_CATEGORIES = ["Leadership","Warehouse","Inventory","Analytics"];
@@ -334,17 +333,17 @@ function renderDayNav(){
 function renderTasks(){
   const day = state.days[state.currentDay-1];
   const mission = MISSIONS[state.currentDay-1];
-  const isAnalyticsDay = mission.leadership === "none";
+  const hasLeadershipTask = mission.leadership !== "none";
   document.getElementById('dayTag').textContent = "DAY " + state.currentDay;
   document.getElementById('missionLine').textContent =
-    `${isAnalyticsDay ? "Analytics Track" : "Leadership Track"} · ${mission.topic}`;
+    `Day ${state.currentDay} of 14 · ${mission.topic}`;
 
   const list = document.getElementById('taskList');
   let items = [
-    {key:'study', title:`Study (30 min): ${mission.topic}`, meta: isAnalyticsDay ? "Knowledge — Analytics XP" : "Knowledge — Leadership XP"},
-    {key:'practical', title:"Practical Exercise (30 min)", meta: isAnalyticsDay ? "Applied skill — Analytics XP" : "Applied skill — Leadership XP"},
+    {key:'study', title:`Study (30 min): ${mission.topic}`, meta:"Knowledge — Warehouse XP"},
+    {key:'practical', title:"Practical Exercise (30 min)", meta:"Applied skill — Inventory XP"},
   ];
-  if(!isAnalyticsDay){
+  if(hasLeadershipTask){
     items.push({key:'leadership', title:"Leadership Mission (20 min)", meta:"Leadership XP"});
   }
   items.push({key:'reflection', title:"Reflection (10 min)", meta:"Analytics XP — logged below"});
@@ -362,25 +361,25 @@ function renderTasks(){
       </div>
     `;
     row.querySelector('input').addEventListener('change', (e)=>{
-      toggleTask(it.key, e.target.checked, isAnalyticsDay);
+      toggleTask(it.key, e.target.checked);
     });
     list.appendChild(row);
   });
 }
 
-function xpForTask(key, isAnalyticsDay){
-  if(key==='study') return isAnalyticsDay ? {Analytics:8} : {Leadership:8};
-  if(key==='practical') return isAnalyticsDay ? {Analytics:10} : {Leadership:6, Inventory:4};
+function xpForTask(key){
+  if(key==='study') return {Warehouse:8};
+  if(key==='practical') return {Warehouse:6, Inventory:6};
   if(key==='leadership') return {Leadership:14};
   if(key==='reflection') return {Analytics:6};
   return {};
 }
 
-function toggleTask(key, value, isAnalyticsDay){
+function toggleTask(key, value){
   const day = state.days[state.currentDay-1];
   const wasDone = day.tasksDone[key];
   day.tasksDone[key] = value;
-  const xpMap = xpForTask(key, isAnalyticsDay);
+  const xpMap = xpForTask(key);
   Object.keys(xpMap).forEach(cat=>{
     if(value && !wasDone) state.xp[cat] = Math.min(100, state.xp[cat] + xpMap[cat]);
     if(!value && wasDone) state.xp[cat] = Math.max(0, state.xp[cat] - xpMap[cat]);
@@ -423,7 +422,7 @@ function renderMission(){
   card.querySelector('.reflect').addEventListener('input', (e)=>{
     day.reflectionText = e.target.value;
     if(e.target.value.trim().length > 10 && !day.tasksDone.reflection){
-      toggleTask('reflection', true, m.leadership === "none");
+      toggleTask('reflection', true);
     } else {
       saveState();
     }
