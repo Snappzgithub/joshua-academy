@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joshua Academy — Shift Board</title>
+<style>
+  :root{
+    --bg:#14171a;
+    --panel:#1c2024;
+    --panel-2:#22272b;
+    --line:#2c3237;
+    --amber:#ffb000;
+    --amber-dim:#7a5900;
+    --cyan:#4fd1c5;
+    --red:#ff5d5d;
+    --text:#e7e5e0;
+    --muted:#8b9097;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Courier New", monospace;
+    --display: ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--display);}
+  body{padding:0 0 60px 0;}
+
+  /* SHIFT BOARD HEADER */
+  .shiftboard{
+    background: repeating-linear-gradient(180deg, #16191c 0px, #16191c 2px, #14171a 2px, #14171a 4px);
+    border-bottom: 3px solid var(--amber);
+    padding: 18px 20px 14px;
+    position: sticky; top:0; z-index: 50;
+  }
+  .sb-row{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;}
+  .sb-title{
+    font-family: var(--mono);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--amber);
+  }
+  .sb-clock{font-family:var(--mono); font-size:13px; color:var(--muted);}
+  .sb-greet{font-size: clamp(22px,5vw,32px); font-weight:800; margin:6px 0 2px; letter-spacing:-0.5px;}
+  .sb-sub{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
+
+  .wrap{max-width: 980px; margin: 0 auto; padding: 22px 18px;}
+
+  .grid{display:grid; gap:16px;}
+  .grid-2{grid-template-columns: 1.3fr 1fr;}
+  @media (max-width:760px){.grid-2{grid-template-columns: 1fr;}}
+
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px;
+  }
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 14px; padding-bottom:10px; border-bottom:1px dashed var(--line);
+  }
+  .panel-head h2{
+    font-family: var(--mono); font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    color: var(--muted); margin:0; font-weight:600;
+  }
+  .tag{
+    font-family: var(--mono); font-size: 11px; padding:3px 8px; border-radius:3px;
+    background: var(--amber-dim); color: var(--amber); letter-spacing:1px;
+  }
+
+  /* XP BARS */
+  .xp-row{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+  .xp-label{width:90px; font-size:12px; font-family:var(--mono); color:var(--muted); text-transform:uppercase;}
+  .xp-track{flex:1; height:10px; background:var(--panel-2); border-radius:5px; overflow:hidden; border:1px solid var(--line);}
+  .xp-fill{height:100%; background:linear-gradient(90deg, var(--amber-dim), var(--amber)); transition:width .4s ease;}
+  .xp-fill.cyan{background:linear-gradient(90deg, #155e58, var(--cyan));}
+  .xp-pct{width:38px; text-align:right; font-family:var(--mono); font-size:12px; color:var(--text);}
+
+  /* PROMOTION SCORE DIAL */
+  .score-wrap{display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px 0;}
+  .score-num{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--amber); line-height:1;}
+  .score-label{font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted);}
+
+  /* TASK LIST */
+  .task{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .task:last-child{border-bottom:none;}
+  .task input[type=checkbox]{
+    appearance:none; width:18px; height:18px; min-width:18px; margin-top:2px;
+    border:2px solid var(--muted); border-radius:3px; cursor:pointer; position:relative;
+  }
+  .task input[type=checkbox]:checked{border-color:var(--amber); background:var(--amber);}
+  .task input[type=checkbox]:checked::after{
+    content:"✓"; position:absolute; top:-3px; left:1px; font-size:13px; color:#14171a; font-weight:700;
+  }
+  .task-body{flex:1;}
+  .task-title{font-weight:600; font-size:14.5px;}
+  .task-meta{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:2px;}
+  .task.done .task-title{color:var(--muted); text-decoration:line-through;}
+
+  /* MISSION CARD */
+  .mission-day{font-family:var(--mono); color:var(--amber); font-size:13px; letter-spacing:1px;}
+  .mission-topic{font-size:20px; font-weight:800; margin:4px 0 12px;}
+  .mission-block{margin-bottom:14px;}
+  .mission-block h4{
+    font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    color:var(--cyan); margin:0 0 6px;
+  }
+  .mission-block p{margin:0; font-size:14px; line-height:1.5; color:var(--text);}
+  textarea.reflect{
+    width:100%; min-height:70px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:4px; color:var(--text); font-family:var(--display); font-size:13.5px; padding:8px; resize:vertical;
+  }
+
+  .btn{
+    font-family:var(--mono); font-size:12px; letter-spacing:1px; text-transform:uppercase;
+    background:var(--amber); color:#14171a; border:none; padding:10px 16px; border-radius:4px;
+    cursor:pointer; font-weight:700;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--line);}
+  .btn.ghost:hover{color:var(--text); border-color:var(--muted);}
+
+  .daynav{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;}
+  .daypill{
+    font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:3px;
+    border:1px solid var(--line); color:var(--muted); cursor:pointer; background:var(--panel-2);
+  }
+  .daypill.active{border-color:var(--amber); color:var(--amber); background:var(--amber-dim);}
+  .daypill.complete{color:var(--cyan); border-color:var(--cyan);}
+
+  .sync-status{font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; align-items:center; gap:6px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--muted);}
+  .dot.ok{background:#3ddc97;}
+  .dot.err{background:var(--red);}
+
+  .settings-row{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .settings-row input[type=text]{
+    flex:1; min-width:200px; background:var(--panel-2); border:1px solid var(--line); border-radius:4px;
+    color:var(--text); padding:8px 10px; font-family:var(--mono); font-size:12px;
+  }
+  .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="shiftboard">
+  <div class="wrap" style="padding:0;">
+    <div class="sb-row">
+      <div class="sb-title">JOSHUA ACADEMY // SHIFT BOARD v1.0</div>
+      <div class="sb-clock" id="clock">--:--:-- PHT</div>
+    </div>
+    <div class="sb-greet" id="greet">Good evening, Joshua</div>
+    <div class="sb-sub" id="missionLine">Week 1 · Warehouse Fundamentals</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="grid grid-2">
+    <!-- LEFT: XP + TASKS -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Current XP</h2>
+        <span class="tag">LIVE</span>
+      </div>
+      <div id="xpBars"></div>
+    </div>
+
+    <!-- RIGHT: PROMOTION SCORE -->
+    <div class="panel">
+      <div class="panel-head"><h2>Promotion Readiness</h2></div>
+      <div class="score-wrap">
+        <div class="score-num" id="scoreNum">0%</div>
+        <div class="score-label">Composite Score</div>
+      </div>
+      <div class="foot-note" id="scoreBreak"></div>
+    </div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Today's Tasks</h2>
+      <span class="tag" id="dayTag">DAY 1</span>
+    </div>
+    <div id="taskList"></div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Mission Log — Weeks 1–2</h2>
+    </div>
+    <div class="daynav" id="dayNav"></div>
+    <div id="missionCard"></div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Sync Settings</h2>
+      <div class="sync-status"><span class="dot" id="syncDot"></span><span id="syncText">not connected</span></div>
+    </div>
+    <div class="foot-note">
+      Paste your Google Apps Script Web App URL below to sync progress across devices.
+      Without it, progress is saved only on this device (browser local storage).
+    </div>
+    <div class="settings-row">
+      <input type="text" id="webhookUrl" placeholder="https://script.google.com/macros/s/XXXX/exec">
+      <button class="btn" id="saveWebhook">Save & Test</button>
+      <button class="btn ghost" id="pushNow">Sync Now</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============== DATA: 14-DAY WAREHOUSE FUNDAMENTALS TRACK ============== */
+const MISSIONS = [
+  {topic:"Receiving", study:"How inbound trucks are checked in, what documents must match (PO, delivery receipt, packing list), and why mismatches at this stage cause every downstream problem.", practical:"Pull your last 3 receiving records (real or recalled from memory at Airspeed/CubeworkPH). Write down one discrepancy you saw and what document caught it.", leadership:"Explain to a new hire, in 3 sentences, why receiving accuracy matters more than receiving speed."},
+  {topic:"Putaway", study:"Putaway logic: fixed location vs dynamic/directed putaway, and how WMS decides where a SKU goes (zone, velocity, UOM).", practical:"Sketch a simple zone map (fast-movers near outbound, slow-movers further back) for a warehouse you've worked in.", leadership:"Write a 2-line instruction you'd give a picker who keeps putting items in the wrong zone — correcting without blaming."},
+  {topic:"Picking", study:"Picking strategies: single-order picking, batch picking, zone picking, wave picking — when each makes sense.", practical:"Compare batch vs single-order picking for a 50-order morning wave. Which would you choose and why?", leadership:"Your picker is consistently 20% slower than peers. Draft how you'd open that conversation."},
+  {topic:"Packing", study:"Packing QC checkpoints: weight verification, item count match, damage check — and how packing errors get traced back.", practical:"List 3 packing QC checks you'd enforce that aren't currently standard at a site you've worked.", leadership:"A packer skips QC steps when busy. What's your 1-sentence non-negotiable rule?"},
+  {topic:"Sorting", study:"Outbound sortation: by carrier, by route, by destination zone — and why sort errors are costly late in the process.", practical:"Design a basic sort matrix: 3 carriers x 2 priority levels = how many sort lanes do you need?", leadership:"How would you retrain a sorter who mis-sorts during peak volume — without slowing the line further?"},
+  {topic:"Inventory", study:"System vs physical inventory: why they drift apart, and the core reconciliation cycle (count → compare → investigate → correct → log).", practical:"Recall a real inventory discrepancy you resolved (e.g. the COI cross-PO misassignment at Airspeed). Write it as a 4-line case: Problem → Investigation → Root Cause → Fix.", leadership:"Draft the SOP step you'd add so that specific discrepancy never recurs."},
+  {topic:"Returns", study:"Reverse logistics flow: return intake, condition grading, restock vs scrap vs return-to-vendor decision points.", practical:"Map a returns decision tree: Good condition → restock. Damaged → ? Wrong item → ?", leadership:"A return is graded incorrectly and restocked as sellable. Who do you talk to first, and what do you say?"},
+  {topic:"Cross Dock", study:"Cross-docking: skipping storage entirely when inbound matches outbound demand directly — and the timing risk involved.", practical:"Identify one scenario from your own work history where cross-docking could have saved processing time.", leadership:"Explain cross-dock timing risk to a teammate in plain language, no jargon."},
+  {topic:"Cycle Count", study:"Cycle counting methodology: ABC classification, count frequency by SKU velocity, and tying counts back to audit compliance.", practical:"Design a simple ABC cycle count schedule: A-items weekly, B-items monthly, C-items quarterly — for 1,000 SKUs.", leadership:"A cycle count keeps getting skipped during busy weeks. Propose one fix that doesn't add headcount."},
+  {topic:"Shift Handover", study:"What a complete shift handover must contain: open issues, pending counts, safety incidents, staffing gaps — and why incomplete handovers cause repeat mistakes.", practical:"Write a real shift handover note using a template: Status / Open Issues / Carry-Over Tasks / Safety Notes.", leadership:"Your outgoing shift gives you a vague handover. What 3 questions do you ask before they leave?"},
+  {topic:"Warehouse KPIs", study:"Core warehouse KPIs: order accuracy, picking productivity (lines/hour), inventory accuracy %, on-time dispatch rate.", practical:"Pick 3 KPIs you'd track if you ran a shift. Define how each is calculated.", leadership:"Outbound productivity dropped 18% this week. Using Shift Report, Attendance, Order Volume, and Scanner Logs — write your root cause hypothesis and one corrective action."},
+  {topic:"Labor Planning", study:"Headcount planning against forecasted volume: peak vs trough staffing, cross-training, and overtime cost tradeoffs.", practical:"Given a forecast of 3,000 orders (vs normal 2,000), calculate roughly how many extra pickers you'd request if 1 picker = 80 orders/shift.", leadership:"You're short 2 staff for a peak shift. What's your plan B using only the people already on shift?"},
+  {topic:"Safety", study:"Common warehouse safety incidents (forklift, falls, manual handling) and the role of near-miss reporting in prevention.", practical:"Write a near-miss report for a hypothetical (or real) close call you've witnessed.", leadership:"A teammate ignores a safety procedure 'because it's faster.' What do you say in the moment?"},
+  {topic:"Root Cause Analysis", study:"5-Whys and fishbone basics — structured ways to get from symptom to true root cause instead of guessing.", practical:"Take any discrepancy from Day 6 (Inventory) and run it through 5-Whys, writing all 5 levels.", leadership:"Summarize, in 3 sentences, why 'who made the mistake' is the wrong first question after an error."},
+];
+
+const XP_CATEGORIES = ["Leadership","Warehouse","Inventory","Analytics"];
+const STORAGE_KEY = "joshuaAcademyState_v1";
+
+/* ============== STATE ============== */
+function defaultState(){
+  return {
+    currentDay: 1,
+    xp: {Leadership:0, Warehouse:0, Inventory:0, Analytics:0},
+    days: MISSIONS.map((m,i)=>({
+      index:i+1,
+      tasksDone:{study:false, practical:false, leadership:false, reflection:false},
+      reflectionText:""
+    })),
+    webhookUrl: ""
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){ return defaultState(); }
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+/* ============== CLOCK ============== */
+function tickClock(){
+  const now = new Date();
+  const opts = {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, timeZone:'Asia/Manila'};
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-PH', opts) + " PHT";
+  const h = parseInt(now.toLocaleString('en-PH',{hour:'2-digit',hour12:false,timeZone:'Asia/Manila'}));
+  let greet = "Good evening, Joshua";
+  if(h>=5 && h<12) greet = "Good morning, Joshua";
+  else if(h>=12 && h<18) greet = "Good afternoon, Joshua";
+  document.getElementById('greet').textContent = greet;
+}
+tickClock(); setInterval(tickClock, 1000);
+
+/* ============== RENDER: XP ============== */
+function calcXpPct(val){ return Math.min(100, Math.round((val/100)*100)); }
+
+function renderXP(){
+  const wrap = document.getElementById('xpBars');
+  wrap.innerHTML = "";
+  XP_CATEGORIES.forEach(cat=>{
+    const pct = calcXpPct(state.xp[cat]);
+    const isCyan = (cat === "Analytics");
+    const row = document.createElement('div');
+    row.className = "xp-row";
+    row.innerHTML = `
+      <div class="xp-label">${cat}</div>
+      <div class="xp-track"><div class="xp-fill ${isCyan?'cyan':''}" style="width:${pct}%"></div></div>
+      <div class="xp-pct">${pct}%</div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function renderScore(){
+  const vals = XP_CATEGORIES.map(c=>state.xp[c]);
+  const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  document.getElementById('scoreNum').textContent = Math.min(100,avg) + "%";
+  document.getElementById('scoreBreak').textContent =
+    XP_CATEGORIES.map(c=>`${c} ${calcXpPct(state.xp[c])}%`).join("  ·  ");
+}
+
+/* ============== RENDER: DAY NAV ============== */
+function renderDayNav(){
+  const nav = document.getElementById('dayNav');
+  nav.innerHTML = "";
+  state.days.forEach(d=>{
+    const t = d.tasksDone;
+    const complete = t.study && t.practical && t.leadership && t.reflection;
+    const pill = document.createElement('div');
+    pill.className = "daypill" + (d.index===state.currentDay ? " active":"") + (complete ? " complete":"");
+    pill.textContent = "D" + d.index;
+    pill.onclick = ()=>{ state.currentDay = d.index; saveState(); renderAll(); };
+    nav.appendChild(pill);
+  });
+}
+
+/* ============== RENDER: TASKS ============== */
+function renderTasks(){
+  const day = state.days[state.currentDay-1];
+  const mission = MISSIONS[state.currentDay-1];
+  document.getElementById('dayTag').textContent = "DAY " + state.currentDay;
+  document.getElementById('missionLine').textContent =
+    `Week ${state.currentDay<=7?1:2} · ${mission.topic}`;
+
+  const list = document.getElementById('taskList');
+  const items = [
+    {key:'study', title:`Study (30 min): ${mission.topic}`, meta:"Knowledge — Warehouse XP"},
+    {key:'practical', title:"Practical Exercise (30 min)", meta:"Applied skill — Inventory/Warehouse XP"},
+    {key:'leadership', title:"Leadership Mission (20 min)", meta:"Leadership XP"},
+    {key:'reflection', title:"Reflection (10 min)", meta:"Analytics XP — logged below"},
+  ];
+  list.innerHTML = "";
+  items.forEach(it=>{
+    const done = day.tasksDone[it.key];
+    const row = document.createElement('div');
+    row.className = "task" + (done?" done":"");
+    row.innerHTML = `
+      <input type="checkbox" ${done?"checked":""} data-key="${it.key}">
+      <div class="task-body">
+        <div class="task-title">${it.title}</div>
+        <div class="task-meta">${it.meta}</div>
+      </div>
+    `;
+    row.querySelector('input').addEventListener('change', (e)=>{
+      toggleTask(it.key, e.target.checked);
+    });
+    list.appendChild(row);
+  });
+}
+
+function xpForTask(key){
+  if(key==='study') return {Warehouse:8};
+  if(key==='practical') return {Warehouse:6, Inventory:6};
+  if(key==='leadership') return {Leadership:14};
+  if(key==='reflection') return {Analytics:10};
+  return {};
+}
+
+function toggleTask(key, value){
+  const day = state.days[state.currentDay-1];
+  const wasDone = day.tasksDone[key];
+  day.tasksDone[key] = value;
+  const xpMap = xpForTask(key);
+  Object.keys(xpMap).forEach(cat=>{
+    if(value && !wasDone) state.xp[cat] = Math.min(100, state.xp[cat] + xpMap[cat]);
+    if(!value && wasDone) state.xp[cat] = Math.max(0, state.xp[cat] - xpMap[cat]);
+  });
+  saveState();
+  renderAll();
+}
+
+/* ============== RENDER: MISSION CARD ============== */
+function renderMission(){
+  const m = MISSIONS[state.currentDay-1];
+  const day = state.days[state.currentDay-1];
+  const card = document.getElementById('missionCard');
+  card.innerHTML = `
+    <div class="mission-day">DAY ${state.currentDay} OF 14</div>
+    <div class="mission-topic">${m.topic}</div>
+
+    <div class="mission-block">
+      <h4>Study</h4>
+      <p>${m.study}</p>
+    </div>
+    <div class="mission-block">
+      <h4>Practical Exercise</h4>
+      <p>${m.practical}</p>
+    </div>
+    <div class="mission-block">
+      <h4>Leadership Mission</h4>
+      <p>${m.leadership}</p>
+    </div>
+    <div class="mission-block">
+      <h4>Reflection — write your own answer</h4>
+      <textarea class="reflect" placeholder="What's one thing from today you'd actually apply on shift?">${day.reflectionText || ""}</textarea>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      <button class="btn ghost" id="prevDay" ${state.currentDay<=1?"disabled":""}>← Prev Day</button>
+      <button class="btn" id="nextDay" ${state.currentDay>=14?"disabled":""}>Next Day →</button>
+    </div>
+  `;
+  card.querySelector('.reflect').addEventListener('input', (e)=>{
+    day.reflectionText = e.target.value;
+    if(e.target.value.trim().length > 10 && !day.tasksDone.reflection){
+      toggleTask('reflection', true);
+    } else {
+      saveState();
+    }
+  });
+  const prevBtn = card.querySelector('#prevDay');
+  const nextBtn = card.querySelector('#nextDay');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{ state.currentDay--; saveState(); renderAll(); });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{ state.currentDay++; saveState(); renderAll(); });
+}
+
+/* ============== SYNC (Google Sheets via Apps Script) ============== */
+function setSyncStatus(kind, text){
+  const dot = document.getElementById('syncDot');
+  dot.className = "dot" + (kind ? " "+kind : "");
+  document.getElementById('syncText').textContent = text;
+}
+
+async function pushToSheet(){
+  if(!state.webhookUrl){ setSyncStatus('err', 'no webhook URL set'); return; }
+  setSyncStatus('', 'syncing…');
+  try{
+    const payload = {
+      action: "save",
+      timestamp: new Date().toISOString(),
+      currentDay: state.currentDay,
+      xp: state.xp,
+      days: state.days
+    };
+    await fetch(state.webhookUrl, {
+      method: "POST",
+      mode: "no-cors", // Apps Script webhooks typically don't return CORS headers
+      headers: {"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(payload)
+    });
+    // no-cors means we can't read the response — assume success if no network error
+    setSyncStatus('ok', 'synced just now');
+  }catch(e){
+    setSyncStatus('err', 'sync failed — check URL');
+  }
+}
+
+document.getElementById('saveWebhook').addEventListener('click', ()=>{
+  const val = document.getElementById('webhookUrl').value.trim();
+  state.webhookUrl = val;
+  saveState();
+  if(val) pushToSheet();
+  else setSyncStatus('', 'not connected');
+});
+
+document.getElementById('pushNow').addEventListener('click', pushToSheet);
+
+/* ============== MAIN RENDER ============== */
+function renderAll(){
+  renderXP();
+  renderScore();
+  renderDayNav();
+  renderTasks();
+  renderMission();
+}
+
+// init webhook field from state
+document.getElementById('webhookUrl').value = state.webhookUrl || "";
+if(state.webhookUrl) setSyncStatus('ok', 'configured (not yet tested)');
+
+renderAll();
+</script>
+</body>
+</html>
