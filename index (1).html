@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joshua Academy — Shift Board</title>
+<style>
+  :root{
+    --bg:#14171a;
+    --panel:#1c2024;
+    --panel-2:#22272b;
+    --line:#2c3237;
+    --amber:#ffb000;
+    --amber-dim:#7a5900;
+    --cyan:#4fd1c5;
+    --red:#ff5d5d;
+    --text:#e7e5e0;
+    --muted:#8b9097;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Courier New", monospace;
+    --display: ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--display);}
+  body{padding:0 0 60px 0;}
+
+  /* SHIFT BOARD HEADER */
+  .shiftboard{
+    background: repeating-linear-gradient(180deg, #16191c 0px, #16191c 2px, #14171a 2px, #14171a 4px);
+    border-bottom: 3px solid var(--amber);
+    padding: 18px 20px 14px;
+    position: sticky; top:0; z-index: 50;
+  }
+  .sb-row{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;}
+  .sb-title{
+    font-family: var(--mono);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--amber);
+  }
+  .sb-clock{font-family:var(--mono); font-size:13px; color:var(--muted);}
+  .sb-greet{font-size: clamp(22px,5vw,32px); font-weight:800; margin:6px 0 2px; letter-spacing:-0.5px;}
+  .sb-sub{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
+
+  .wrap{max-width: 980px; margin: 0 auto; padding: 22px 18px;}
+
+  .grid{display:grid; gap:16px;}
+  .grid-2{grid-template-columns: 1.3fr 1fr;}
+  @media (max-width:760px){.grid-2{grid-template-columns: 1fr;}}
+
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px;
+  }
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 14px; padding-bottom:10px; border-bottom:1px dashed var(--line);
+  }
+  .panel-head h2{
+    font-family: var(--mono); font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    color: var(--muted); margin:0; font-weight:600;
+  }
+  .tag{
+    font-family: var(--mono); font-size: 11px; padding:3px 8px; border-radius:3px;
+    background: var(--amber-dim); color: var(--amber); letter-spacing:1px;
+  }
+
+  /* XP BARS */
+  .xp-row{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+  .xp-label{width:90px; font-size:12px; font-family:var(--mono); color:var(--muted); text-transform:uppercase;}
+  .xp-track{flex:1; height:10px; background:var(--panel-2); border-radius:5px; overflow:hidden; border:1px solid var(--line);}
+  .xp-fill{height:100%; background:linear-gradient(90deg, var(--amber-dim), var(--amber)); transition:width .4s ease;}
+  .xp-fill.cyan{background:linear-gradient(90deg, #155e58, var(--cyan));}
+  .xp-pct{width:38px; text-align:right; font-family:var(--mono); font-size:12px; color:var(--text);}
+
+  /* PROMOTION SCORE DIAL */
+  .score-wrap{display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px 0;}
+  .score-num{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--amber); line-height:1;}
+  .score-label{font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted);}
+
+  /* TASK LIST */
+  .task{
+    display:flex; align-items:flex-start; gap:10px; padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .task:last-child{border-bottom:none;}
+  .task input[type=checkbox]{
+    appearance:none; width:18px; height:18px; min-width:18px; margin-top:2px;
+    border:2px solid var(--muted); border-radius:3px; cursor:pointer; position:relative;
+  }
+  .task input[type=checkbox]:checked{border-color:var(--amber); background:var(--amber);}
+  .task input[type=checkbox]:checked::after{
+    content:"✓"; position:absolute; top:-3px; left:1px; font-size:13px; color:#14171a; font-weight:700;
+  }
+  .task-body{flex:1;}
+  .task-title{font-weight:600; font-size:14.5px;}
+  .task-meta{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:2px;}
+  .task.done .task-title{color:var(--muted); text-decoration:line-through;}
+
+  /* MISSION CARD */
+  .mission-day{font-family:var(--mono); color:var(--amber); font-size:13px; letter-spacing:1px;}
+  .mission-topic{font-size:20px; font-weight:800; margin:4px 0 12px;}
+  .mission-block{margin-bottom:14px;}
+  .mission-block h4{
+    font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    color:var(--cyan); margin:0 0 6px;
+  }
+  .mission-block p{margin:0; font-size:14px; line-height:1.5; color:var(--text);}
+  textarea.reflect{
+    width:100%; min-height:70px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:4px; color:var(--text); font-family:var(--display); font-size:13.5px; padding:8px; resize:vertical;
+  }
+
+  .btn{
+    font-family:var(--mono); font-size:12px; letter-spacing:1px; text-transform:uppercase;
+    background:var(--amber); color:#14171a; border:none; padding:10px 16px; border-radius:4px;
+    cursor:pointer; font-weight:700;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--line);}
+  .btn.ghost:hover{color:var(--text); border-color:var(--muted);}
+
+  .daynav{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;}
+  .daypill{
+    font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:3px;
+    border:1px solid var(--line); color:var(--muted); cursor:pointer; background:var(--panel-2);
+  }
+  .daypill.active{border-color:var(--amber); color:var(--amber); background:var(--amber-dim);}
+  .daypill.complete{color:var(--cyan); border-color:var(--cyan);}
+
+  .sync-status{font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; align-items:center; gap:6px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--muted);}
+  .dot.ok{background:#3ddc97;}
+  .dot.err{background:var(--red);}
+
+  .settings-row{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .settings-row input[type=text]{
+    flex:1; min-width:200px; background:var(--panel-2); border:1px solid var(--line); border-radius:4px;
+    color:var(--text); padding:8px 10px; font-family:var(--mono); font-size:12px;
+  }
+  .foot-note{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="shiftboard">
+  <div class="wrap" style="padding:0;">
+    <div class="sb-row">
+      <div class="sb-title">JOSHUA ACADEMY // SHIFT BOARD v1.0</div>
+      <div class="sb-clock" id="clock">--:--:-- PHT</div>
+    </div>
+    <div class="sb-greet" id="greet">Good evening, Joshua</div>
+    <div class="sb-sub" id="missionLine">Leadership Track · Day 1</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="grid grid-2">
+    <!-- LEFT: XP + TASKS -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Current XP</h2>
+        <span class="tag">LIVE</span>
+      </div>
+      <div id="xpBars"></div>
+    </div>
+
+    <!-- RIGHT: PROMOTION SCORE -->
+    <div class="panel">
+      <div class="panel-head"><h2>Promotion Readiness</h2></div>
+      <div class="score-wrap">
+        <div class="score-num" id="scoreNum">0%</div>
+        <div class="score-label">Composite Score</div>
+      </div>
+      <div class="foot-note" id="scoreBreak"></div>
+    </div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Today's Tasks</h2>
+      <span class="tag" id="dayTag">DAY 1</span>
+    </div>
+    <div id="taskList"></div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Mission Log — Weeks 1–2</h2>
+    </div>
+    <div class="daynav" id="dayNav"></div>
+    <div id="missionCard"></div>
+  </div>
+
+  <div style="height:16px;"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Sync Settings</h2>
+      <div class="sync-status"><span class="dot" id="syncDot"></span><span id="syncText">not connected</span></div>
+    </div>
+    <div class="foot-note">
+      Paste your Google Apps Script Web App URL below to sync progress across devices.
+      Without it, progress is saved only on this device (browser local storage).
+    </div>
+    <div class="settings-row">
+      <input type="text" id="webhookUrl" placeholder="https://script.google.com/macros/s/XXXX/exec">
+      <button class="btn" id="saveWebhook">Save & Test</button>
+      <button class="btn ghost" id="pushNow">Sync Now</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============== DATA: 14-DAY LEADERSHIP + ANALYTICS TRACK ============== */
+/* Operational basics (receiving, putaway, picking, etc.) already mastered
+   through 3+ years across Nokia/Globe 3PL, Airspeed, and CubeworkPH.
+   This track skips ahead to Leadership and the Excel → Power Query →
+   SQL → Power BI → Python analytics progression. */
+const MISSIONS = [
+  {topic:"Leading Former Peers", study:"The hardest leadership transition: managing people who used to be your equals. The core shift is from 'doing the work well' to 'making the team's work go well' — and why authority granted by title isn't the same as authority earned by respect.", practical:"Write down one specific peer-turned-subordinate situation you can realistically face (or have faced). What would you say in your first 1-on-1 with them as their lead?", leadership:"Draft a 3-sentence opening line for that first conversation that neither over-apologizes for the promotion nor pretends nothing changed."},
+  {topic:"Excel — Beyond XLOOKUP", study:"Where most 'advanced Excel' users actually plateau: structured tables, named ranges, INDEX/MATCH vs XLOOKUP edge cases, and array formulas (SUMPRODUCT, FILTER) for multi-condition lookups.", practical:"Take a real inventory dataset shape you've worked with (SKU, location, qty, last-counted date). Write the formula logic (in words or Excel syntax) you'd use to flag any SKU not counted in 30+ days.", leadership:"none"},
+  {topic:"Giving Instructions", study:"Why vague instructions ('be more careful') fail and specific, observable instructions succeed. The structure: state the standard, show the gap, give one corrective action, set a check-in point.", practical:"Take a real instance of a teammate's repeated small error (e.g. wrong UOM entry). Rewrite the correction as one specific, observable instruction.", leadership:"Practice saying it out loud once before you'd actually say it to someone — does it sound like blame or direction?"},
+  {topic:"Power Query", study:"Power Query as the missing link between messy exports and clean analysis: combining multiple CSV/Excel exports, unpivoting columns, and building a repeatable refresh step instead of manual copy-paste every time.", practical:"Describe a real recurring report you've built manually (e.g. discrepancy report, SKU master review). Outline the Power Query steps that would automate the cleanup: Source → Remove columns → Unpivot → Merge → Load.", leadership:"none"},
+  {topic:"Coaching", study:"Coaching vs. correcting: correcting fixes one instance, coaching builds the skill so the person catches their own mistakes next time. The GROW model basics — Goal, Reality, Options, Way forward.", practical:"Pick a real skill gap you've seen in a teammate (e.g. cycle count accuracy). Run a mini GROW conversation on paper: what's the goal, what's the current reality, what 2 options exist, what's their committed next step.", leadership:"none"},
+  {topic:"SQL Fundamentals", study:"SELECT, WHERE, ORDER BY, and GROUP BY — the four clauses that cover most real warehouse reporting questions: 'which SKUs', 'how many', 'by what category', 'in what order'.", practical:"Write the SQL you'd use to answer a real question from your work: 'List all SKUs with on-hand quantity below 10, ordered by quantity ascending.' Just write the query logic — accuracy of syntax matters more than memorized keywords.", leadership:"none"},
+  {topic:"Handling Conflict", study:"Why most workplace conflict is really a disagreement about either priorities or information — and why naming which one it is defuses half the tension before you even propose a solution.", practical:"Recall a real disagreement you've had with a coworker or vendor (e.g. discrepancy blame, delivery timing). Identify: was it a priorities conflict or an information conflict? What changes if you reframe it that way?", leadership:"none"},
+  {topic:"SQL Joins & Aggregation", study:"INNER vs LEFT JOIN — the difference between 'only matching records' and 'all records, matched or not' — and why this distinction is exactly what catches orphaned PO lines or unmatched receiving records.", practical:"Describe two tables you'd realistically have (e.g. Purchase_Orders and Receiving_Log). Write the JOIN logic to find all POs that have NO matching receiving record yet — a real aged-PO problem you've handled before.", leadership:"none"},
+  {topic:"Difficult Employees", study:"The difference between a skill problem, a will problem, and a fit problem — because the fix is completely different for each, and applying the wrong fix (e.g. more training for a will problem) wastes everyone's time.", practical:"Think of a real difficult-employee pattern you've observed (not necessarily managed directly). Classify it: skill, will, or fit? What evidence supports that classification?", leadership:"none"},
+  {topic:"Power BI Basics", study:"How Power BI's data model differs from a flat Excel sheet: fact tables vs dimension tables, and why a clean data model makes every future report faster to build instead of starting from scratch each time.", practical:"Sketch (in words) a simple data model for a warehouse KPI dashboard: what would your fact table be (e.g. daily transactions), and what dimension tables would you connect to it (SKU, location, shift, date)?", leadership:"none"},
+  {topic:"Escalations & Decision Making", study:"The escalation decision tree: can I fix this now with what I know? Can it wait for the next handover? Does it need to go up immediately? Most escalation mistakes are timing mistakes, not judgment mistakes.", practical:"Recall a real issue you escalated (or should have). Walk it through the 3-question tree above — would your original timing have changed?", leadership:"none"},
+  {topic:"Power BI — DAX Basics", study:"DAX measures vs calculated columns, and the single most useful pattern for ops dashboards: CALCULATE with a filter, e.g. 'total units received this month' or 'discrepancy count this week vs last week'.", practical:"Write (in plain words, not exact syntax) the logic for a DAX measure that shows 'inventory accuracy % this month' using a count of correct counts divided by total counts.", leadership:"none"},
+  {topic:"Delegation & Time Management", study:"Why delegation fails most often at the handoff, not the task itself — missing context, unclear deadline, or no defined 'done.' Time management for a lead is less about your own calendar and more about protecting the team's focus blocks.", practical:"Pick a real task you currently do yourself that someone else could own. Write the 3-part handoff: context, deadline, definition of done.", leadership:"none"},
+  {topic:"Python for Automation", study:"Where Python actually starts paying off past Excel/SQL: scheduled scripts that pull data, clean it, and push it somewhere else automatically — the same shape as the AI bulk-update workflow you already sandbox-tested at CubeworkPH, just script-driven instead of AI-driven.", practical:"Describe, step by step, what a Python script would need to do to replicate one real automation you've already built or used (e.g. the Shopify scraper + AI description workflow). What are the inputs, the transform steps, and the output?", leadership:"none"},
+];
+
+const XP_CATEGORIES = ["Leadership","Warehouse","Inventory","Analytics"];
+const STORAGE_KEY = "joshuaAcademyState_v1";
+
+/* ============== STATE ============== */
+function defaultState(){
+  return {
+    currentDay: 1,
+    xp: {Leadership:0, Warehouse:0, Inventory:0, Analytics:0},
+    days: MISSIONS.map((m,i)=>({
+      index:i+1,
+      tasksDone:{study:false, practical:false, leadership:false, reflection:false},
+      reflectionText:""
+    })),
+    webhookUrl: ""
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){ return defaultState(); }
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+
+/* ============== CLOCK ============== */
+function tickClock(){
+  const now = new Date();
+  const opts = {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, timeZone:'Asia/Manila'};
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-PH', opts) + " PHT";
+  const h = parseInt(now.toLocaleString('en-PH',{hour:'2-digit',hour12:false,timeZone:'Asia/Manila'}));
+  let greet = "Good evening, Joshua";
+  if(h>=5 && h<12) greet = "Good morning, Joshua";
+  else if(h>=12 && h<18) greet = "Good afternoon, Joshua";
+  document.getElementById('greet').textContent = greet;
+}
+tickClock(); setInterval(tickClock, 1000);
+
+/* ============== RENDER: XP ============== */
+function calcXpPct(val){ return Math.min(100, Math.round((val/100)*100)); }
+
+function renderXP(){
+  const wrap = document.getElementById('xpBars');
+  wrap.innerHTML = "";
+  XP_CATEGORIES.forEach(cat=>{
+    const pct = calcXpPct(state.xp[cat]);
+    const isCyan = (cat === "Analytics");
+    const row = document.createElement('div');
+    row.className = "xp-row";
+    row.innerHTML = `
+      <div class="xp-label">${cat}</div>
+      <div class="xp-track"><div class="xp-fill ${isCyan?'cyan':''}" style="width:${pct}%"></div></div>
+      <div class="xp-pct">${pct}%</div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function renderScore(){
+  const vals = XP_CATEGORIES.map(c=>state.xp[c]);
+  const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  document.getElementById('scoreNum').textContent = Math.min(100,avg) + "%";
+  document.getElementById('scoreBreak').textContent =
+    XP_CATEGORIES.map(c=>`${c} ${calcXpPct(state.xp[c])}%`).join("  ·  ");
+}
+
+/* ============== RENDER: DAY NAV ============== */
+function renderDayNav(){
+  const nav = document.getElementById('dayNav');
+  nav.innerHTML = "";
+  state.days.forEach(d=>{
+    const t = d.tasksDone;
+    const complete = t.study && t.practical && t.leadership && t.reflection;
+    const pill = document.createElement('div');
+    pill.className = "daypill" + (d.index===state.currentDay ? " active":"") + (complete ? " complete":"");
+    pill.textContent = "D" + d.index;
+    pill.onclick = ()=>{ state.currentDay = d.index; saveState(); renderAll(); };
+    nav.appendChild(pill);
+  });
+}
+
+/* ============== RENDER: TASKS ============== */
+function renderTasks(){
+  const day = state.days[state.currentDay-1];
+  const mission = MISSIONS[state.currentDay-1];
+  const isAnalyticsDay = mission.leadership === "none";
+  document.getElementById('dayTag').textContent = "DAY " + state.currentDay;
+  document.getElementById('missionLine').textContent =
+    `${isAnalyticsDay ? "Analytics Track" : "Leadership Track"} · ${mission.topic}`;
+
+  const list = document.getElementById('taskList');
+  let items = [
+    {key:'study', title:`Study (30 min): ${mission.topic}`, meta: isAnalyticsDay ? "Knowledge — Analytics XP" : "Knowledge — Leadership XP"},
+    {key:'practical', title:"Practical Exercise (30 min)", meta: isAnalyticsDay ? "Applied skill — Analytics XP" : "Applied skill — Leadership XP"},
+  ];
+  if(!isAnalyticsDay){
+    items.push({key:'leadership', title:"Leadership Mission (20 min)", meta:"Leadership XP"});
+  }
+  items.push({key:'reflection', title:"Reflection (10 min)", meta:"Analytics XP — logged below"});
+
+  list.innerHTML = "";
+  items.forEach(it=>{
+    const done = day.tasksDone[it.key];
+    const row = document.createElement('div');
+    row.className = "task" + (done?" done":"");
+    row.innerHTML = `
+      <input type="checkbox" ${done?"checked":""} data-key="${it.key}">
+      <div class="task-body">
+        <div class="task-title">${it.title}</div>
+        <div class="task-meta">${it.meta}</div>
+      </div>
+    `;
+    row.querySelector('input').addEventListener('change', (e)=>{
+      toggleTask(it.key, e.target.checked, isAnalyticsDay);
+    });
+    list.appendChild(row);
+  });
+}
+
+function xpForTask(key, isAnalyticsDay){
+  if(key==='study') return isAnalyticsDay ? {Analytics:8} : {Leadership:8};
+  if(key==='practical') return isAnalyticsDay ? {Analytics:10} : {Leadership:6, Inventory:4};
+  if(key==='leadership') return {Leadership:14};
+  if(key==='reflection') return {Analytics:6};
+  return {};
+}
+
+function toggleTask(key, value, isAnalyticsDay){
+  const day = state.days[state.currentDay-1];
+  const wasDone = day.tasksDone[key];
+  day.tasksDone[key] = value;
+  const xpMap = xpForTask(key, isAnalyticsDay);
+  Object.keys(xpMap).forEach(cat=>{
+    if(value && !wasDone) state.xp[cat] = Math.min(100, state.xp[cat] + xpMap[cat]);
+    if(!value && wasDone) state.xp[cat] = Math.max(0, state.xp[cat] - xpMap[cat]);
+  });
+  saveState();
+  renderAll();
+}
+
+/* ============== RENDER: MISSION CARD ============== */
+function renderMission(){
+  const m = MISSIONS[state.currentDay-1];
+  const day = state.days[state.currentDay-1];
+  const card = document.getElementById('missionCard');
+  card.innerHTML = `
+    <div class="mission-day">DAY ${state.currentDay} OF 14</div>
+    <div class="mission-topic">${m.topic}</div>
+
+    <div class="mission-block">
+      <h4>Study</h4>
+      <p>${m.study}</p>
+    </div>
+    <div class="mission-block">
+      <h4>Practical Exercise</h4>
+      <p>${m.practical}</p>
+    </div>
+    ${m.leadership !== "none" ? `
+    <div class="mission-block">
+      <h4>Leadership Mission</h4>
+      <p>${m.leadership}</p>
+    </div>` : ""}
+    <div class="mission-block">
+      <h4>Reflection — write your own answer</h4>
+      <textarea class="reflect" placeholder="What's one thing from today you'd actually apply on shift?">${day.reflectionText || ""}</textarea>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      <button class="btn ghost" id="prevDay" ${state.currentDay<=1?"disabled":""}>← Prev Day</button>
+      <button class="btn" id="nextDay" ${state.currentDay>=14?"disabled":""}>Next Day →</button>
+    </div>
+  `;
+  card.querySelector('.reflect').addEventListener('input', (e)=>{
+    day.reflectionText = e.target.value;
+    if(e.target.value.trim().length > 10 && !day.tasksDone.reflection){
+      toggleTask('reflection', true, m.leadership === "none");
+    } else {
+      saveState();
+    }
+  });
+  const prevBtn = card.querySelector('#prevDay');
+  const nextBtn = card.querySelector('#nextDay');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{ state.currentDay--; saveState(); renderAll(); });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{ state.currentDay++; saveState(); renderAll(); });
+}
+
+/* ============== SYNC (Google Sheets via Apps Script) ============== */
+function setSyncStatus(kind, text){
+  const dot = document.getElementById('syncDot');
+  dot.className = "dot" + (kind ? " "+kind : "");
+  document.getElementById('syncText').textContent = text;
+}
+
+async function pushToSheet(){
+  if(!state.webhookUrl){ setSyncStatus('err', 'no webhook URL set'); return; }
+  setSyncStatus('', 'syncing…');
+  try{
+    const payload = {
+      action: "save",
+      timestamp: new Date().toISOString(),
+      currentDay: state.currentDay,
+      xp: state.xp,
+      days: state.days
+    };
+    await fetch(state.webhookUrl, {
+      method: "POST",
+      mode: "no-cors", // Apps Script webhooks typically don't return CORS headers
+      headers: {"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(payload)
+    });
+    // no-cors means we can't read the response — assume success if no network error
+    setSyncStatus('ok', 'synced just now');
+  }catch(e){
+    setSyncStatus('err', 'sync failed — check URL');
+  }
+}
+
+document.getElementById('saveWebhook').addEventListener('click', ()=>{
+  const val = document.getElementById('webhookUrl').value.trim();
+  state.webhookUrl = val;
+  saveState();
+  if(val) pushToSheet();
+  else setSyncStatus('', 'not connected');
+});
+
+document.getElementById('pushNow').addEventListener('click', pushToSheet);
+
+/* ============== MAIN RENDER ============== */
+function renderAll(){
+  renderXP();
+  renderScore();
+  renderDayNav();
+  renderTasks();
+  renderMission();
+}
+
+// init webhook field from state
+document.getElementById('webhookUrl').value = state.webhookUrl || "";
+if(state.webhookUrl) setSyncStatus('ok', 'configured (not yet tested)');
+
+renderAll();
+</script>
+</body>
+</html>
